@@ -1,0 +1,23 @@
+FROM registry.redhat.io/rhel9/rhel-bootc:9.6
+
+ARG ADMIN_USERNAME=demo \
+    ADMIN_PASSWORD=redhat
+
+RUN <<EOF
+set -Eeuo pipefail
+
+dnf config-manager --enable ansible-automation-platform-2.5-for-rhel-9-$(arch)-rpms
+dnf install -y mkpasswd podman skopeo flightctl-agent
+
+if [ -n "$ADMIN_USERNAME" ]; then
+  useradd -m -G wheel -p "$(echo -n "$ADMIN_PASSWORD" | mkpasswd -m bcrypt --stdin)" "$ADMIN_USERNAME"
+fi
+EOF
+
+ADD --chown=root:root root /
+
+RUN <<EOF
+set -Eeuo pipefail
+systemctl enable flightctl-agent.service
+systemctl mask bootc-fetch-apply-updates.timer
+EOF
