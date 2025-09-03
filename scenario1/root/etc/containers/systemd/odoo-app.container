@@ -1,0 +1,43 @@
+[Unit]
+Description=Odoo
+Documentation=https://www.odoo.com/documentation/
+
+# Require initialization to complete first
+Requires=odoo-init.service odoo-db.service
+After=odoo-init.service odoo-db.service
+
+# Only start if initialization has completed
+ConditionPathExists=/var/lib/odoo/initialized
+
+[Container]
+ContainerName=odoo-app
+Image=docker.io/library/odoo:17
+
+# Network configuration
+Network=host
+AddCapability=CAP_NET_BIND_SERVICE
+
+# Volume mounts
+Volume=/etc/odoo:/etc/odoo:ro
+Volume=/var/lib/odoo/data:/var/lib/odoo:z
+Volume=/var/lib/odoo/addons:/mnt/extra-addons:z
+Volume=/var/log/odoo:/var/log/odoo:z
+
+# Health check
+HealthCmd=curl -fs -o /dev/null -w "%{http_code}\n" http://127.0.0.1/web/login
+HealthInterval=30s
+HealthTimeout=10s
+HealthStartPeriod=60s
+HealthRetries=3
+
+[Service]
+Restart=always
+RestartSec=10
+TimeoutStartSec=600
+TimeoutStopSec=30
+
+# Wait for PostgreSQL to be ready
+ExecStartPre=/bin/sh -c 'exec 2>/dev/null; for try in $(seq 0 12); do if ! /bin/true 5<> /dev/tcp/127.0.0.1/5432; then echo "Waiting for PostgreSQL to be available..."; sleep 5; else exit 0; fi; done; exit 1'
+
+[Install]
+WantedBy=odoo.target

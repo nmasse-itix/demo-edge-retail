@@ -1,0 +1,12 @@
+[Unit]
+Description=Odoo Service Target
+Documentation=man:systemd.target(5)
+# This target represents the complete MyApp service stack
+# It groups both the init and main services together
+Wants=odoo-db.service odoo-init.service odoo-app.service
+After=odoo-db.service odoo-init.service odoo-app.service
+# Allow isolation - can stop/start this target independently
+AllowIsolate=yes
+
+[Install]
+WantedBy=multi-user.target
