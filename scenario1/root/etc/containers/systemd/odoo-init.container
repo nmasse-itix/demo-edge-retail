@@ -39,7 +39,7 @@ RemainAfterExit=yes
 ExecStartPost=/bin/touch /var/lib/odoo/initialized
 
 # Skaffold filesystem + fix permissions
-ExecStartPre=/bin/sh -c 'for d in /var/lib/odoo/data /var/lib/odoo/addons /var/log/odoo; do mkdir -p "$d" ; chmod 700 "$d" ; chown 101:101 "$d" ; done'
+ExecStartPre=install -m 0700 -o 101 -g 101 -d /var/lib/odoo/data /var/lib/odoo/addons /var/log/odoo
 
 # Wait for PostgreSQL to be ready
 ExecStartPre=/bin/sh -c 'exec 2>/dev/null; for try in $(seq 0 12); do if ! /bin/true 5<> /dev/tcp/127.0.0.1/5432; then echo "Waiting for PostgreSQL to be available..."; sleep 5; else exit 0; fi; done; exit 1'

@@ -7,8 +7,12 @@ if [[ "$UID" -ne 0 ]]; then
   exit 1
 fi
 
-. "$PWD/env.sh"
+if [ "$#" -ne 1 ]; then
+  echo "Usage: $0 <target-image>"
+  exit 1
+fi
 
+TARGET_IMAGE="$1"
 OCI_REGISTRY="${TARGET_IMAGE%%/*}"
 SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
@@ -39,5 +43,5 @@ if [ ! -f "$REGISTRY_AUTH_FILE" ]; then
   podman login registry.redhat.io
 fi
 
-podman build -t "${TARGET_IMAGE}" .
+podman build --no-cache -t "${TARGET_IMAGE}" .
 podman push --sign-by-sigstore-private-key "$PROJECT_DIR/signing-key.private" --sign-passphrase-file "$PROJECT_DIR/signing-key.pass" "${TARGET_IMAGE}"

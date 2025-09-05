@@ -7,7 +7,10 @@ RUN <<EOF
 set -Eeuo pipefail
 
 dnf config-manager --enable ansible-automation-platform-2.5-for-rhel-9-$(arch)-rpms
-dnf install -y mkpasswd podman skopeo flightctl-agent
+dnf install -y mkpasswd podman skopeo flightctl-agent cockpit cockpit-machines cockpit-podman \
+               cockpit-files cockpit-ostree cockpit-pcp cockpit-system libvirt libvirt-daemon-kvm \
+               virt-install virt-top libguestfs-tools genisoimage greenboot greenboot-default-health-checks
+dnf clean all
 
 if [ -n "$ADMIN_USERNAME" ]; then
   useradd -m -G wheel -p "$(echo -n "$ADMIN_PASSWORD" | mkpasswd -m bcrypt --stdin)" "$ADMIN_USERNAME"
@@ -18,6 +21,11 @@ ADD --chown=root:root root /
 
 RUN <<EOF
 set -Eeuo pipefail
-systemctl enable flightctl-agent.service
+systemctl enable flightctl-agent.service cockpit.socket libvirtd.service libvirt-guests.service
 systemctl mask bootc-fetch-apply-updates.timer
+if [ -n "$ADMIN_USERNAME" -a -f "/etc/ssh/authorized_keys/$ADMIN_USERNAME.keys" ]; then
+  chown "$ADMIN_USERNAME:$ADMIN_USERNAME" "/etc/ssh/authorized_keys/$ADMIN_USERNAME.keys"
+fi
+semanage fcontext -a -t ssh_home_t "/etc/ssh/authorized_keys(/.*)?"
+restorecon -Rf /etc/ssh/authorized_keys
 EOF

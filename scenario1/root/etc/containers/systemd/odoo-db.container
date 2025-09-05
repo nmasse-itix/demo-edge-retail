@@ -21,7 +21,7 @@ EnvironmentFile=/etc/containers/systemd/configs/odoo-db.env
 Volume=/var/lib/postgresql/data:/var/lib/postgresql/data:Z
 
 # Health check
-HealthCmd=pg_isready -U odoo
+HealthCmd=pg_isready -U odoo -d postgres
 HealthInterval=30s
 HealthTimeout=10s
 HealthStartPeriod=60s
@@ -32,6 +32,9 @@ Restart=always
 RestartSec=10
 TimeoutStartSec=120
 TimeoutStopSec=30
+
+# Skaffold filesystem + fix permissions
+ExecStartPre=install -m 0700 -o 70 -g 70 -d /var/lib/postgresql/data
 
 [Install]
 WantedBy=odoo.target
