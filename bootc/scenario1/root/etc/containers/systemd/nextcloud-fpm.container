@@ -1,0 +1,55 @@
+[Unit]
+Description=Nextcloud PHP-FPM Application
+Documentation=https://nextcloud.com/
+After=network.target
+
+# Require initialization to complete first
+Requires=nextcloud-db.service nextcloud-redis.service
+After=nextcloud-db.service nextcloud-redis.service
+
+# Only start if Nextcloud has been configured
+ConditionPathExists=/etc/containers/systemd/configs/nextcloud-config.env
+
+[Container]
+ContainerName=nextcloud-app
+Image=docker.io/library/odoo:17
+
+# Network configuration
+Network=host
+AddCapability=CAP_NET_BIND_SERVICE
+
+# Environment variables from secrets and config
+EnvironmentFile=/etc/containers/systemd/configs/nextcloud-app.env
+EnvironmentFile=/etc/containers/systemd/configs/nextcloud-config.env
+
+# Volume mounts
+Volume=/var/lib/nextcloud:/var/www/html:z
+Volume=/var/lib/nextcloud/config/www.conf:/usr/local/etc/php-fpm.d/www.conf:Z
+Volume=/var/lib/nextcloud/config/redis-session.ini:/usr/local/etc/php/conf.d/redis-session.ini:Z
+
+# Health check (equivalent to readiness probe)
+HealthCmd=nc -z localhost 9000
+HealthInterval=30s
+HealthTimeout=10s
+HealthStartPeriod=60s
+HealthRetries=3
+
+[Service]
+Restart=always
+RestartSec=10
+TimeoutStartSec=600
+TimeoutStopSec=30
+
+# Skaffold filesystem + fix permissions
+ExecStartPre=/bin/bash -Eeuo pipefail -c 'install -m 0700 -o 82 -g 82 -d /var/lib/nextcloud/data /var/lib/nextcloud/config ; \
+  install -m 0700 -o 82 -g 82 -d /etc/containers/systemd/configs/www.conf /var/lib/nextcloud/config/www.conf ; \
+  install -m 0700 -o 82 -g 82 -d /etc/containers/systemd/configs/redis-session.ini /var/lib/nextcloud/config/redis-session.ini'
+
+# Wait for PostgreSQL to be ready
+ExecStartPre=/bin/sh -c 'exec 2>/dev/null; for try in $(seq 0 12); do if ! /bin/true 5<> /dev/tcp/127.0.0.1/5432; then echo "Waiting for PostgreSQL to be available..."; sleep 5; else exit 0; fi; done; exit 1'
+
+# Wait for Redis to be ready
+ExecStartPre=/bin/sh -c 'exec 2>/dev/null; for try in $(seq 0 12); do if ! /bin/true 5<> /dev/tcp/127.0.0.1/6379; then echo "Waiting for Redis to be available..."; sleep 5; else exit 0; fi; done; exit 1'
+
+[Install]
+WantedBy=nextcloud.target

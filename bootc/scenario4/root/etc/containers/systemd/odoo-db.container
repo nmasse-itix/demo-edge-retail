@@ -3,16 +3,15 @@ Description=PostgreSQL Database Server
 Documentation=https://www.postgresql.org/
 After=network.target
 
+# Only start if Odoo has been configured
+ConditionPathExists=/etc/containers/systemd/configs/odoo-config.env
+
 [Container]
 ContainerName=odoo-db
 Image=docker.io/library/postgres:17-alpine
 
 # Network configuration
 Network=host
-
-# Security context (equivalent to K8s securityContext)
-#NoNewPrivileges=true
-#DropCapability=ALL
 
 # Environment variables from config
 EnvironmentFile=/etc/containers/systemd/configs/odoo-db.env

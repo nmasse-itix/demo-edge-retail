@@ -1,0 +1,28 @@
+#!/bin/bash
+
+set -Eeuo pipefail
+declare -a container_state=()
+MAX_ATTEMPTS=60
+
+for attempt in (( i=1; i<=MAX_ATTEMPTS; i++ )); do
+  echo "Checking Nextcloud deployment ($attempt/$MAX_ATTEMPTS)..."
+  
+  state=1
+  for container in nextcloud-db nextcloud-redis nextcloud-fpm nextcloud-nginx; do
+    container_state=( $( ( podman inspect "$container" || true ) | jq -r '.[0].State.Status // "unknown", .[0].State.Health.Status // "unknown"') )
+    echo "Container $container has state ${container_state[0]} and its health is ${container_state[1]}!"
+    if [[ "${container_state[0]}-${container_state[1]}" != "running-healthy" ]]; then
+      state=0
+    fi
+  done
+
+  if [[ $state -eq 1 ]]; then
+    echo "Nextcloud deployment is up and running!"
+    exit 0
+  fi
+
+  sleep 5
+done
+
+echo "Nextcloud deployment is not running correctly after $MAX_ATTEMPTS attempts!"
+exit 1

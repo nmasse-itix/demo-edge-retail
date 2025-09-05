@@ -1,0 +1,39 @@
+[Unit]
+Description=PostgreSQL Database Server
+Documentation=https://www.postgresql.org/
+After=network.target
+
+# Only start if Nextcloud has been configured
+ConditionPathExists=/etc/containers/systemd/configs/nextcloud-config.env
+
+[Container]
+ContainerName=nextcloud-db
+Image=docker.io/library/postgres:17-alpine
+
+# Network configuration
+Network=host
+
+# Environment variables from config
+EnvironmentFile=/etc/containers/systemd/configs/nextcloud-db.env
+
+# Volume mounts
+Volume=/var/lib/postgresql/data:/var/lib/postgresql/data:Z
+
+# Health check
+HealthCmd=pg_isready -U nextcloud -d nextcloud
+HealthInterval=30s
+HealthTimeout=10s
+HealthStartPeriod=60s
+HealthRetries=3
+
+[Service]
+Restart=always
+RestartSec=10
+TimeoutStartSec=120
+TimeoutStopSec=30
+
+# Skaffold filesystem + fix permissions
+ExecStartPre=install -m 0700 -o 70 -g 70 -d /var/lib/postgresql/data
+
+[Install]
+WantedBy=nextcloud.target

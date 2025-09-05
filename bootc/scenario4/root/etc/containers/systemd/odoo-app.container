@@ -6,6 +6,9 @@ Documentation=https://www.odoo.com/documentation/
 Requires=odoo-init.service odoo-db.service
 After=odoo-init.service odoo-db.service
 
+# Only start if Odoo has been configured
+ConditionPathExists=/etc/containers/systemd/configs/odoo-config.env
+
 # Only start if initialization has completed
 ConditionPathExists=/var/lib/odoo/initialized
 

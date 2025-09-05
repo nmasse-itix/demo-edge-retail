@@ -1,0 +1,43 @@
+[Unit]
+Description=Redis Cache for Nextcloud
+Documentation=https://redis.io/
+After=network.target 
+
+# Only start if Nextcloud has been configured
+ConditionPathExists=/etc/containers/systemd/configs/nextcloud-config.env
+
+[Container]
+ContainerName=nextcloud-redis
+Image=docker.io/library/redis:8-alpine
+
+# Network configuration
+Network=host
+
+# Redis configuration with authentication
+Exec=redis-server /usr/local/etc/redis/redis.conf
+
+# Environment variables
+EnvironmentFile=/etc/containers/systemd/configs/nextcloud-redis.env
+
+# Volume mounts for data persistence
+Volume=/var/lib/redis:/data:Z
+Volume=/etc/containers/systemd/configs/redis.conf:/usr/local/etc/redis/redis.conf:ro
+
+# Health check
+HealthCmd=redis-cli ping | grep -q PONG
+HealthInterval=30s
+HealthTimeout=5s
+HealthStartPeriod=10s
+HealthRetries=3
+
+[Service]
+Restart=always
+RestartSec=5
+TimeoutStartSec=300
+TimeoutStopSec=30
+
+# Skaffold filesystem + fix permissions
+ExecStartPre=install -m 0700 -o 0 -g 0 -d /var/lib/redis
+
+[Install]
+WantedBy=nextcloud.target
