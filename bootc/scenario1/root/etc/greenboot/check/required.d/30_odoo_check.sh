@@ -9,11 +9,11 @@ for attempt in (( i=1; i<=MAX_ATTEMPTS; i++ )); do
   
   state=1
   for container in odoo-db odoo-app; do
-	container_state=( $( ( podman inspect "$container" || true ) | jq -r '.[0].State.Status // "unknown", .[0].State.Health.Status // "unknown"') )
+    container_state=( $( ( podman inspect "$container" || true ) | jq -r '.[0].State.Status // "unknown", .[0].State.Health.Status // "unknown"') )
     echo "Container $container has state ${container_state[0]} and its health is ${container_state[1]}!"
-	if [[ "${container_state[0]}-${container_state[1]}" != "running-healthy" ]]; then
-	  state=0
-	fi
+    if [[ "${container_state[0]}-${container_state[1]}" != "running-healthy" ]]; then
+      state=0
+    fi
   done
 
   if [[ $state -eq 1 ]]; then
