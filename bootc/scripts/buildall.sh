@@ -12,7 +12,7 @@ PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 
 . "$PROJECT_DIR/config.env"
 
-for dir in "$PROJECT_DIR"/{generic,scenario*}; do
+for dir in "$PROJECT_DIR"/{base,scenario*}; do
   if [ -d "$dir" -a -f "$dir/Containerfile" ]; then
     export SCENARIO="${dir##*/}"
     TARGET_IMAGE="$(echo -n "$TARGET_IMAGE_TEMPLATE" | envsubst)"
