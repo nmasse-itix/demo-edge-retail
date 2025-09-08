@@ -1,0 +1,9 @@
+apiVersion: flightctl.io/v1alpha1
+kind: Repository
+metadata:
+  annotations: {}
+  labels: {}
+  name: demo-edge-retail
+spec:
+  url: https://github.com/nmasse-itix/demo-edge-retail.git
+  type: git

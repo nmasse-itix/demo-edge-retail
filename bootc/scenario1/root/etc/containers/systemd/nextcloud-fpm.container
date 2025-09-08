@@ -12,7 +12,10 @@ ConditionPathExists=/etc/containers/systemd/configs/nextcloud-config.env
 
 [Container]
 ContainerName=nextcloud-app
-Image=docker.io/library/odoo:17
+Image=docker.io/library/nextcloud:31-fpm-alpine
+
+# Fix the UID/GID of the PHP-FPM daemon
+User=82:82
 
 # Network configuration
 Network=host

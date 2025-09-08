@@ -1,0 +1,28 @@
+apiVersion: flightctl.io/v1alpha1
+kind: Fleet
+metadata:
+  annotations:
+  labels:
+    scenario: '1'
+  name: scenario1
+spec:
+  selector:
+    matchLabels:
+      scenario: '1'
+  template:
+    metadata:
+      labels:
+        fleet: scenario1
+    spec:
+      applications: []
+      config: []
+      os:
+        image: edge-registry.itix.fr/demo-edge-retail/scenario1:latest
+      config:
+      - name: scenario1-config
+        configType: GitConfigProviderSpec
+        gitRef:
+          path: /flightctl/overlays/{{ getOrDefault .status.systemInfo "hostname" "default" }}/scenario1
+          repository: demo-edge-retail
+          targetRevision: main
+
