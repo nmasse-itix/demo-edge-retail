@@ -26,7 +26,7 @@ EnvironmentFile=/etc/containers/systemd/configs/nextcloud-app.env
 EnvironmentFile=/etc/containers/systemd/configs/nextcloud-config.env
 
 # Volume mounts
-Volume=/var/lib/nextcloud:/var/www/html:z
+Volume=/var/lib/nextcloud/data:/var/www/html:z
 Volume=/var/lib/nextcloud/config/www.conf:/usr/local/etc/php-fpm.d/www.conf:Z
 Volume=/var/lib/nextcloud/config/redis-session.ini:/usr/local/etc/php/conf.d/redis-session.ini:Z
 
@@ -45,8 +45,8 @@ TimeoutStopSec=30
 
 # Skaffold filesystem + fix permissions
 ExecStartPre=/bin/bash -Eeuo pipefail -c 'install -m 0700 -o 82 -g 82 -d /var/lib/nextcloud/data /var/lib/nextcloud/config ; \
-  install -m 0700 -o 82 -g 82 -d /etc/containers/systemd/configs/www.conf /var/lib/nextcloud/config/www.conf ; \
-  install -m 0700 -o 82 -g 82 -d /etc/containers/systemd/configs/redis-session.ini /var/lib/nextcloud/config/redis-session.ini'
+  install -m 0700 -o 82 -g 82 /etc/containers/systemd/configs/www.conf /var/lib/nextcloud/config/www.conf ; \
+  install -m 0700 -o 82 -g 82 /etc/containers/systemd/configs/redis-session.ini /var/lib/nextcloud/config/redis-session.ini'
 
 # Wait for PostgreSQL to be ready
 ExecStartPre=/bin/sh -c 'exec 2>/dev/null; for try in $(seq 0 12); do if ! /bin/true 5<> /dev/tcp/127.0.0.1/5432; then echo "Waiting for PostgreSQL to be available..."; sleep 5; else exit 0; fi; done; exit 1'

@@ -4,7 +4,7 @@ set -Eeuo pipefail
 declare -a container_state=()
 MAX_ATTEMPTS=60
 
-for attempt in (( i=1; i<=MAX_ATTEMPTS; i++ )); do
+for (( attempt=1; attempt<=MAX_ATTEMPTS; attempt++ )); do
   echo "Checking Odoo deployment ($attempt/$MAX_ATTEMPTS)..."
   
   state=1
