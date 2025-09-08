@@ -1,7 +1,7 @@
 apiVersion: flightctl.io/v1alpha1
 kind: Fleet
 metadata:
-  annotations:
+  annotations: {}
   labels:
     scenario: '1'
   name: scenario1
@@ -22,7 +22,6 @@ spec:
       - name: scenario1-config
         configType: GitConfigProviderSpec
         gitRef:
-          path: /flightctl/overlays/{{ getOrDefault .status.systemInfo "hostname" "default" }}/scenario1
+          path: /flightctl/overlays/{{ getOrDefault .metadata.labels "overlay" "default" }}/scenario1
           repository: demo-edge-retail
           targetRevision: main
-
