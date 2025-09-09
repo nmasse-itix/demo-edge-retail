@@ -1,0 +1,19 @@
+<network>
+  <name>default</name>
+  <bridge name="virbr0" stp="on" delay="5" />
+  <forward mode='nat' />
+  <domain name="libvirt.test" />
+  <dns>
+    <host ip='192.168.122.1'>
+      <hostname>host</hostname>
+    </host>
+  </dns>
+  <ip address="192.168.122.1" netmask="255.255.255.0" localPtr="yes">
+    <dhcp>
+      <range start="192.168.122.100" end="192.168.122.200">
+        <lease expiry='1' unit='days'/>
+      </range>
+      <host mac="04:00:00:00:00:01" name="vm.libvirt.test" ip="192.168.122.2" />
+    </dhcp>
+  </ip>
+</network>

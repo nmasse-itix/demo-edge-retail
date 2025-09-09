@@ -43,5 +43,10 @@ if [ ! -f "$REGISTRY_AUTH_FILE" ]; then
   podman login registry.redhat.io
 fi
 
+if [ -x "$PWD/custom.sh" ]; then
+  echo "Running custom.sh..."
+  "$PWD/custom.sh"
+fi
+
 podman build --no-cache -t "${TARGET_IMAGE}" .
 podman push --sign-by-sigstore-private-key "$PROJECT_DIR/signing-key.private" --sign-passphrase-file "$PROJECT_DIR/signing-key.pass" "${TARGET_IMAGE}"

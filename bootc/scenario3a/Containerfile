@@ -1,0 +1,8 @@
+FROM edge-registry.itix.fr/demo-edge-retail/base:latest
+
+ADD --chown=root:root root /
+
+RUN <<EOF
+set -Eeuo pipefail
+systemctl enable bootstrap-vm@nextcloud.service
+EOF
