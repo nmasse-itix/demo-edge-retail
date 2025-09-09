@@ -46,12 +46,12 @@ function install_directories() {
 # The templates are located in the www/ks directory.
 # The output files are written to /var/www/ks.
 # The placeholders are in the format expected by envsubst.
-# For each template file, seven versions are created: base + scenario{1,2,3,4,5,6}.
+# For each template file, eight versions are created: base + scenario{1,2,3a,3b,4,5,6}.
 # The output files are named as /var/www/ks/<template>/<scenario>.ks.
 function template_kickstart_files() {
     local templates_dir="${SCRIPT_DIR}/www/ks"
     local output_dir="/var/www/ks"
-    local scenarios=("base" "scenario1" "scenario2" "scenario3" "scenario4" "scenario5" "scenario6")
+    local scenarios=("base" "scenario1" "scenario2" "scenario3a" "scenario3b" "scenario4" "scenario5" "scenario6")
 
     for template in "$templates_dir"/*.ks; do
         local template_name="$(basename "$template" .ks)"

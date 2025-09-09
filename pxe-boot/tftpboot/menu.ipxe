@@ -7,10 +7,11 @@ menu iPXE Menu
 item --key 0 rhde                  [0] Install Red Hat Device Edge - Base
 item --key 1 rhde-scenario1        [1] Install Red Hat Device Edge - Scenario 1
 item --key 2 rhde-scenario2        [2] Install Red Hat Device Edge - Scenario 2
-item --key 3 rhde-scenario3        [3] Install Red Hat Device Edge - Scenario 3
+item --key 3 rhde-scenario3a       [3] Install Red Hat Device Edge - Scenario 3a
 item --key 4 rhde-scenario4        [4] Install Red Hat Device Edge - Scenario 4
 item --key 5 rhde-scenario5        [5] Install Red Hat Device Edge - Scenario 5
 item --key 6 rhde-scenario6        [6] Install Red Hat Device Edge - Scenario 6
+item --key 7 rhde-scenario3b       [7] Install Red Hat Device Edge - Scenario 3b
 item
 item --key r reboot                [R] Reboot computer
 item --key x exit                  [X] Exit iPXE and continue BIOS boot
@@ -38,9 +39,14 @@ initrd ${rhel9_url}/images/pxeboot/initrd.img
 kernel ${rhel9_url}/images/pxeboot/vmlinuz initrd=initrd.img ip=dhcp inst.repo=${rhel9_url} inst.ks=${kickstart_url}/scenario2.ks ${rhde_options}
 boot
 
-:rhde-scenario3
+:rhde-scenario3a
 initrd ${rhel9_url}/images/pxeboot/initrd.img
-kernel ${rhel9_url}/images/pxeboot/vmlinuz initrd=initrd.img ip=dhcp inst.repo=${rhel9_url} inst.ks=${kickstart_url}/scenario3.ks ${rhde_options}
+kernel ${rhel9_url}/images/pxeboot/vmlinuz initrd=initrd.img ip=dhcp inst.repo=${rhel9_url} inst.ks=${kickstart_url}/scenario3a.ks ${rhde_options}
+boot
+
+:rhde-scenario3b
+initrd ${rhel9_url}/images/pxeboot/initrd.img
+kernel ${rhel9_url}/images/pxeboot/vmlinuz initrd=initrd.img ip=dhcp inst.repo=${rhel9_url} inst.ks=${kickstart_url}/scenario3b.ks ${rhde_options}
 boot
 
 :rhde-scenario4
