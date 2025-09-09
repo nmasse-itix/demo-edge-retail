@@ -31,23 +31,23 @@ kind: Fleet
 metadata:
   annotations: {}
   labels:
-    scenario: '1'
-  name: scenario1
+    scenario: '4'
+  name: scenario4
 spec:
   selector:
     matchLabels:
-      scenario: '1'
+      scenario: '4'
   template:
     metadata:
       labels:
-        fleet: scenario1
+        fleet: scenario4
     spec:
       applications: []
       config: []
       os:
-        image: edge-registry.itix.fr/demo-edge-retail/scenario1:latest
+        image: edge-registry.itix.fr/demo-edge-retail/scenario4:latest
       config:
-      - name: scenario1-config
+      - name: scenario4-config
         configType: GitConfigProviderSpec
         gitRef:
           path: /flightctl/scenario4/sites/{{ getOrDefault .metadata.labels "site" "default" }}/
