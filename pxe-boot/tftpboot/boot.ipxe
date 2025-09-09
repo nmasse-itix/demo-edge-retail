@@ -1,0 +1,30 @@
+#!ipxe
+
+# Load global variables
+chain --autofree boot.cfg ||
+
+# Boot config/buildarch-<arch>.ipxe
+# if buildarch DHCP variable is set and script is present
+isset ${buildarch} && chain --autofree config/buildarch-${buildarch}.ipxe ||
+
+# Boot config/hostname-<hostname>.ipxe
+# if hostname DHCP variable is set and script is present
+isset ${hostname} && chain --autofree config/hostname-${hostname}.ipxe ||
+
+# Boot config/uuid-<UUID>.ipxe
+# if SMBIOS UUID variable is set and script is present
+isset ${uuid} && chain --autofree config/uuid-${uuid}.ipxe ||
+
+# Boot config/mac-010203040506.ipxe if script is present
+chain --autofree config/mac-${mac:hexraw}.ipxe ||
+
+# Boot config/pci-8086100e.ipxe if one type of
+# PCI Intel adapter is present and script is present
+chain --autofree config/pci-${pci/${busloc}.0.2}${pci/${busloc}.2.2}.ipxe ||
+
+# Boot config/chip-82541pi.ipxe if one type of
+# PCI Intel adapter is present and script is present
+chain --autofree config/chip-${chip}.ipxe ||
+
+# Boot menu.ipxe script if all other options have been exhausted
+chain --replace --autofree menu.ipxe ||

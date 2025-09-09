@@ -1,0 +1,59 @@
+#!ipxe
+
+isset ${menu_default} || set menu_default rhde
+isset ${menu_timeout} || set menu_timeout 30000
+
+menu iPXE Menu
+item --key 0 rhde                  [0] Install Red Hat Device Edge - Base
+item --key 1 rhde-scenario1        [1] Install Red Hat Device Edge - Scenario 1
+item --key 2 rhde-scenario2        [2] Install Red Hat Device Edge - Scenario 2
+item --key 3 rhde-scenario3        [3] Install Red Hat Device Edge - Scenario 3
+item --key 4 rhde-scenario4        [4] Install Red Hat Device Edge - Scenario 4
+item --key 5 rhde-scenario5        [5] Install Red Hat Device Edge - Scenario 5
+item --key 6 rhde-scenario6        [6] Install Red Hat Device Edge - Scenario 6
+item
+item --key r reboot                [R] Reboot computer
+item --key x exit                  [X] Exit iPXE and continue BIOS boot
+choose --timeout ${menu_timeout} --default ${menu_default} selected
+goto ${selected}
+
+:reboot
+reboot
+
+:exit
+exit
+
+:rhde
+initrd ${rhel9_url}/images/pxeboot/initrd.img
+kernel ${rhel9_url}/images/pxeboot/vmlinuz initrd=initrd.img ip=dhcp inst.repo=${rhel9_url} inst.ks=${kickstart_url}/base.ks ${rhde_options}
+boot
+
+:rhde-scenario1
+initrd ${rhel9_url}/images/pxeboot/initrd.img
+kernel ${rhel9_url}/images/pxeboot/vmlinuz initrd=initrd.img ip=dhcp inst.repo=${rhel9_url} inst.ks=${kickstart_url}/scenario1.ks ${rhde_options}
+boot
+
+:rhde-scenario2
+initrd ${rhel9_url}/images/pxeboot/initrd.img
+kernel ${rhel9_url}/images/pxeboot/vmlinuz initrd=initrd.img ip=dhcp inst.repo=${rhel9_url} inst.ks=${kickstart_url}/scenario2.ks ${rhde_options}
+boot
+
+:rhde-scenario3
+initrd ${rhel9_url}/images/pxeboot/initrd.img
+kernel ${rhel9_url}/images/pxeboot/vmlinuz initrd=initrd.img ip=dhcp inst.repo=${rhel9_url} inst.ks=${kickstart_url}/scenario3.ks ${rhde_options}
+boot
+
+:rhde-scenario4
+initrd ${rhel9_url}/images/pxeboot/initrd.img
+kernel ${rhel9_url}/images/pxeboot/vmlinuz initrd=initrd.img ip=dhcp inst.repo=${rhel9_url} inst.ks=${kickstart_url}/scenario4.ks ${rhde_options}
+boot
+
+:rhde-scenario5
+initrd ${rhel9_url}/images/pxeboot/initrd.img
+kernel ${rhel9_url}/images/pxeboot/vmlinuz initrd=initrd.img ip=dhcp inst.repo=${rhel9_url} inst.ks=${kickstart_url}/scenario5.ks ${rhde_options}
+boot
+
+:rhde-scenario6
+initrd ${rhel9_url}/images/pxeboot/initrd.img
+kernel ${rhel9_url}/images/pxeboot/vmlinuz initrd=initrd.img ip=dhcp inst.repo=${rhel9_url} inst.ks=${kickstart_url}/scenario6.ks ${rhde_options}
+boot
