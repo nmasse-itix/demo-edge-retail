@@ -25,6 +25,10 @@ spec:
           path: /flightctl/scenario1
           repository: demo-edge-retail
           targetRevision: main
+  systemd:
+    matchPatterns:
+      - nextcloud-*.service
+      - nextcloud-*.target
 ---
 apiVersion: flightctl.io/v1alpha1
 kind: Fleet
@@ -53,3 +57,7 @@ spec:
           path: /flightctl/scenario4/sites/{{ getOrDefault .metadata.labels "site" "default" }}/
           repository: demo-edge-retail
           targetRevision: main
+  systemd:
+    matchPatterns:
+      - odoo-*.service
+      - odoo-*.target
