@@ -5,6 +5,8 @@ Wants=nextcloud-db.service nextcloud-redis.service nextcloud-app.service nextclo
 After=nextcloud-db.service nextcloud-redis.service nextcloud-app.service nextcloud-nginx.service
 # Allow isolation - can stop/start this target independently
 AllowIsolate=yes
+# Only start if Nextcloud has been configured
+ConditionPathExists=/etc/containers/systemd/configs/nextcloud-config.env
 
 [Install]
 WantedBy=multi-user.target

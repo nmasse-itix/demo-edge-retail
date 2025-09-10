@@ -22,13 +22,40 @@ spec:
       - name: scenario1-config
         configType: GitConfigProviderSpec
         gitRef:
-          path: /flightctl/scenario1
+          path: /flightctl/scenario1/sites/{{ getOrDefault .metadata.labels "site" "default" }}/
           repository: demo-edge-retail
           targetRevision: main
   systemd:
     matchPatterns:
       - nextcloud-*.service
       - nextcloud-*.target
+---
+apiVersion: flightctl.io/v1alpha1
+kind: Fleet
+metadata:
+  annotations: {}
+  labels:
+    scenario: '3a'
+  name: scenario3a
+spec:
+  selector:
+    matchLabels:
+      scenario: '3a'
+      type: 'baremetal'
+  template:
+    metadata:
+      labels:
+        fleet: scenario3a
+    spec:
+      applications: []
+      config: []
+      os:
+        image: edge-registry.itix.fr/demo-edge-retail/scenario3a:latest
+  systemd:
+    matchPatterns:
+      - bootstrap-vm@nextcloud.service
+      - libvirtd.service
+      - nftables.service
 ---
 apiVersion: flightctl.io/v1alpha1
 kind: Fleet

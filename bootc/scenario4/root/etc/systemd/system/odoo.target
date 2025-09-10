@@ -5,6 +5,8 @@ Wants=odoo-db.service odoo-init.service odoo-app.service
 After=odoo-db.service odoo-init.service odoo-app.service
 # Allow isolation - can stop/start this target independently
 AllowIsolate=yes
+# Only start if Odoo has been configured
+ConditionPathExists=/etc/containers/systemd/configs/odoo-config.env
 
 [Install]
 WantedBy=multi-user.target

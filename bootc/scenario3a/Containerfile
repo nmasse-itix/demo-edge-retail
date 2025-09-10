@@ -5,4 +5,5 @@ ADD --chown=root:root root /
 RUN <<EOF
 set -Eeuo pipefail
 systemctl enable bootstrap-vm@nextcloud.service
+systemctl enable nftables.service
 EOF

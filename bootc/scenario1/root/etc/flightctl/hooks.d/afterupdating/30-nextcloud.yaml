@@ -1,0 +1,4 @@
+- if:
+  - path: /etc/containers/systemd/configs/nextcloud-config.env
+    op: [created, updated, removed]
+  run: systemctl restart nextcloud.target

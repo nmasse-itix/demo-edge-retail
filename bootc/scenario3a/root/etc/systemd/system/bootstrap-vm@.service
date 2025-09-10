@@ -3,13 +3,11 @@ Description=RHDE VM Bootstrap Service
 Documentation=man:systemd.service(5)
 
 # Only start if the VM root disk does not exist
-#ConditionPathExists=!/var/lib/libvirt/images/%i/root.qcow2
-ConditionPathExists=/dummy
+ConditionPathExists=!/var/lib/libvirt/images/%i/root.qcow2
 
 [Service]
 Type=oneshot
 Persistent=true
-#ExecStartPre=/usr/local/bin/configure-network.sh
 ExecStart=/usr/local/bin/bootstrap-vm.sh %i
 EnvironmentFile=/etc/default/bootstrap-vm-%i.env
 

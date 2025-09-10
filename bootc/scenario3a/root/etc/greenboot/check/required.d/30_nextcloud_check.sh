@@ -1,7 +1,5 @@
 #!/bin/bash
 
-exit 0 # Temporary disable the check
-
 set -Eeuo pipefail
 MAX_ATTEMPTS=60
 

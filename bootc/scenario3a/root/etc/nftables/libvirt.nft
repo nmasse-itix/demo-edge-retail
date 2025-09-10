@@ -1,0 +1,16 @@
+#!/usr/sbin/nft -f
+
+destroy table ip libvirt-nat
+
+table ip libvirt-nat {
+    chain Pre-Routing {
+        type nat hook prerouting priority dstnat
+        policy accept
+
+        # Log incoming packets
+        iifname != lo iifname != virbr0 log prefix "PREROUTING: "
+
+        # Redirect port 80 to the Nextcloud VM
+        ip daddr 192.168.2.0/24 iifname != "virbr0" tcp dport { 80 } counter dnat to 192.168.122.2
+    }
+}
