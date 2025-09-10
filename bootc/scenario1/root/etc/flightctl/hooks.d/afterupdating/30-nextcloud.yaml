@@ -1,4 +1,10 @@
 - if:
   - path: /etc/containers/systemd/configs/nextcloud-config.env
-    op: [created, updated, removed]
+    op: [created, updated]
   run: systemctl restart nextcloud.target
+  timeout: 5m
+- if:
+  - path: /etc/containers/systemd/configs/nextcloud-config.env
+    op: [removed]
+  run: /bin/sh -c 'if [ -f /etc/systemd/system/nextcloud.target ]; then systemctl stop nextcloud.target; fi'
+  timeout: 5m

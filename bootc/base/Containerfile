@@ -7,9 +7,11 @@ RUN <<EOF
 set -Eeuo pipefail
 
 dnf config-manager --enable ansible-automation-platform-2.5-for-rhel-9-$(arch)-rpms
+dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
 dnf install -y mkpasswd podman skopeo flightctl-agent cockpit cockpit-machines cockpit-podman \
                cockpit-files cockpit-ostree cockpit-pcp cockpit-system libvirt libvirt-daemon-kvm \
-               virt-install virt-top libguestfs-tools genisoimage greenboot greenboot-default-health-checks
+               virt-install virt-top libguestfs-tools genisoimage greenboot greenboot-default-health-checks \
+               stress-ng yq podman-compose tmux
 dnf clean all
 
 if [ -n "$ADMIN_USERNAME" ]; then

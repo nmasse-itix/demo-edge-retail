@@ -3,6 +3,29 @@ kind: Fleet
 metadata:
   annotations: {}
   labels:
+    scenario: 'base'
+  name: base
+spec:
+  selector:
+    matchLabels:
+      scenario: 'base'
+  template:
+    metadata:
+      labels:
+        fleet: base
+    spec:
+      applications: []
+      config: []
+      os:
+        image: edge-registry.itix.fr/demo-edge-retail/base:latest
+      systemd:
+        matchPatterns: []
+---
+apiVersion: flightctl.io/v1alpha1
+kind: Fleet
+metadata:
+  annotations: {}
+  labels:
     scenario: '1'
   name: scenario1
 spec:
@@ -15,7 +38,6 @@ spec:
         fleet: scenario1
     spec:
       applications: []
-      config: []
       os:
         image: edge-registry.itix.fr/demo-edge-retail/scenario1:latest
       config:
@@ -25,10 +47,12 @@ spec:
           path: /flightctl/scenario1/sites/{{ getOrDefault .metadata.labels "site" "default" }}/
           repository: demo-edge-retail
           targetRevision: main
-  systemd:
-    matchPatterns:
-      - nextcloud-*.service
-      - nextcloud-*.target
+      systemd:
+        matchPatterns:
+          - nextcloud-app.service
+          - nextcloud-db.service
+          - nextcloud-nginx.service
+          - nextcloud-redis.service
 ---
 apiVersion: flightctl.io/v1alpha1
 kind: Fleet
@@ -51,11 +75,11 @@ spec:
       config: []
       os:
         image: edge-registry.itix.fr/demo-edge-retail/scenario3a:latest
-  systemd:
-    matchPatterns:
-      - bootstrap-vm@nextcloud.service
-      - libvirtd.service
-      - nftables.service
+      systemd:
+        matchPatterns:
+          - bootstrap-vm@nextcloud.service
+          - libvirtd.service
+          - nftables.service
 ---
 apiVersion: flightctl.io/v1alpha1
 kind: Fleet
@@ -74,7 +98,6 @@ spec:
         fleet: scenario4
     spec:
       applications: []
-      config: []
       os:
         image: edge-registry.itix.fr/demo-edge-retail/scenario4:latest
       config:
@@ -84,7 +107,8 @@ spec:
           path: /flightctl/scenario4/sites/{{ getOrDefault .metadata.labels "site" "default" }}/
           repository: demo-edge-retail
           targetRevision: main
-  systemd:
-    matchPatterns:
-      - odoo-*.service
-      - odoo-*.target
+      systemd:
+        matchPatterns:
+          - odoo-app.service
+          - odoo-db.service
+          - odoo-init.service
