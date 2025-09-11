@@ -42,6 +42,8 @@ function install_directories() {
     done
 }
 
+
+
 # This function templates a kickstart file by replacing placeholders with actual values.
 # The templates are located in the www/ks directory.
 # The output files are written to /var/www/ks.
@@ -58,21 +60,38 @@ function template_kickstart_files() {
 
         for scenario in "${scenarios[@]}"; do
             install -d -m 0755 -o root -g root -Z "$output_dir/${template_name}"
-            local output_file="$output_dir/${template_name}/${scenario}.ks"
-            echo "Templating $template_name to $output_file"
-            (
-                export SCENARIO_NAME="$scenario"
-                if [ -f "auth.json" ]; then
-                    export AUTH_JSON_CONTENT="$(cat auth.json)"
-                fi
-                if [ -f "config.yaml" ]; then
-                    export FLIGHTCTL_CONFIG_CONTENT="$(cat config.yaml)"
-                fi
-                envsubst < "$template" > "/tmp/tmp.$$.ks"
-            )
-            install -m 0644 -o root -g root "/tmp/tmp.$$.ks" "$output_file"
+            template_kickstart_file "$template" "$scenario"
         done
     done
+}
+
+# This function templates a single kickstart file.
+# It takes two arguments: the path to the template file and the current scenario.
+# It uses envsubst to replace placeholders with actual values.
+function template_kickstart_file () {
+    local template="$1"
+    local scenario="$2"
+    local template_name="$(basename "$template" .ks)"
+    local output_file="$output_dir/${template_name}/${scenario}.ks"
+
+    echo "Templating $template_name to $output_file"
+    (
+        if [ -f "auth.json" ]; then
+            export AUTH_JSON_CONTENT="$(cat auth.json)"
+        fi
+        if [ -f "config.yaml" ]; then
+            declare -n device_labels=${mac_labels[$template_name]}
+            local labels_json="{ \"scenario\": \"$scenario\""
+            for label in "${!device_labels[@]}"; do
+                labels_json+=", \"$label\": \"${device_labels[$label]}\""
+            done
+            labels_json+="}"
+            export FLIGHTCTL_CONFIG_CONTENT="$(yq e ".default-labels += $labels_json" config.yaml)"
+        fi
+        envsubst < "$template" > "/tmp/tmp.$$.ks"
+        declare +x AUTH_JSON_CONTENT FLIGHTCTL_CONFIG_CONTENT
+    )
+    install -m 0644 -o root -g root "/tmp/tmp.$$.ks" "$output_file"
 }
 
 echo "Installing PXE boot files..."
@@ -82,6 +101,13 @@ install_files "${SCRIPT_DIR}/tftpboot" "/var/lib/tftpboot" -m 644 -o dnsmasq -g 
 install -m 0644 -o dnsmasq -g dnsmasq /usr/share/ipxe/{undionly.kpxe,ipxe-snponly-x86_64.efi} /var/lib/tftpboot/
 install -m 0644 -o dnsmasq -g dnsmasq /usr/share/ipxe/arm64-efi/snponly.efi /var/lib/tftpboot/ipxe-snponly-arm64.efi
 restorecon -RF "/var/lib/tftpboot"
+
+declare -A mac_00be43ec5619_labels=( ["site"]="paris-wagram" ["type"]="baremetal" )
+declare -A mac_00190f440391_labels=( ["site"]="villeneuve-d-ascq" ["type"]="baremetal" )
+declare -A mac_labels=( 
+    [mac-00be43ec5619]="mac_00be43ec5619_labels"
+    [mac-00190f440391]="mac_00190f440391_labels"
+)
 
 echo "Installing nginx files..."
 rm -rf "/var/www/ks"
