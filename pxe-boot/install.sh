@@ -76,6 +76,7 @@ function template_kickstart_file () {
 
     echo "Templating $template_name to $output_file"
     (
+        export SCENARIO_NAME="$scenario"
         if [ -f "auth.json" ]; then
             export AUTH_JSON_CONTENT="$(cat auth.json)"
         fi
@@ -89,7 +90,7 @@ function template_kickstart_file () {
             export FLIGHTCTL_CONFIG_CONTENT="$(yq e ".default-labels += $labels_json" config.yaml)"
         fi
         envsubst < "$template" > "/tmp/tmp.$$.ks"
-        declare +x AUTH_JSON_CONTENT FLIGHTCTL_CONFIG_CONTENT
+        declare +x AUTH_JSON_CONTENT FLIGHTCTL_CONFIG_CONTENT SCENARIO_NAME
     )
     install -m 0644 -o root -g root "/tmp/tmp.$$.ks" "$output_file"
 }
