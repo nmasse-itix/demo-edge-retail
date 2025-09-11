@@ -8,14 +8,20 @@ if [[ $# -ne 1 ]]; then
 fi
 
 VM="${1}"
+temp_dir=$(mktemp -d)
+cleanup() {
+  rm -rf "$temp_dir"
+}
+trap cleanup EXIT
 
 mkdir -p "/var/lib/libvirt/images/${VM}"
 cp -a "/usr/local/libvirt/images/${VM}/qcow2/disk.qcow2" "/var/lib/libvirt/images/${VM}/root.qcow2"
 
 # Inject the Flightctl configuration file (w/ enrollment certificates) into the VM image
 if [ -f /etc/flightctl/config.yaml ]; then
-  guestfish --add /var/lib/libvirt/images/${VM}/root.qcow2 -m /dev/sda4 <<'EOF'
-copy-in /etc/flightctl/config.yaml /ostree/deploy/default/var/lib/flightctl/
+  yq e '.default-labels += { "type": "virtualmachine" }' /etc/flightctl/config.yaml > "$temp_dir/config.yaml"
+  guestfish --add /var/lib/libvirt/images/${VM}/root.qcow2 -m /dev/sda4 <<EOF
+copy-in $temp_dir/config.yaml /ostree/deploy/default/var/lib/flightctl/
 EOF
 fi
 
