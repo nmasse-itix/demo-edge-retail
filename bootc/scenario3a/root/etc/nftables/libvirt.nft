@@ -12,16 +12,21 @@ table ip libvirt-nat {
         type filter hook forward priority filter - 10
         policy accept
         
-        iifname != "virbr0" ip daddr 192.168.122.2/24 tcp dport { 80 } ct state { new } counter accept
-        ip daddr 192.168.122.2/24 ct state { related, established } counter accept
-        ip saddr 192.168.122.2/24 ct state { related, established } counter accept
+        # Accept packets related to existing connections
+        ct state invalid counter drop
+        ct state { established, related } counter accept
+
+        oifname "virbr0" ip daddr 192.168.122.2/24 tcp dport { 80, 9090 } ct state { new } counter accept
     }
 
     chain Pre-Routing {
-        type nat hook prerouting priority dstnat
+        type nat hook prerouting priority dstnat - 10
         policy accept
 
-        # Redirect port 80 to the Nextcloud VM
-        ip daddr 192.168.2.0/24 iifname != "virbr0" tcp dport { 80 } counter dnat to 192.168.122.2
+        # Redirect HTTP connections to the Nextcloud VM
+        iifname != "virbr0" ip daddr 192.168.2.0/24 tcp dport 80 counter dnat to 192.168.122.2
+
+        # Redirect Cockpit connections to the Nextcloud VM
+        iifname != "virbr0" ip daddr 192.168.2.0/24 tcp dport 9091 counter dnat to 192.168.122.2:9090
     }
 }

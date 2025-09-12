@@ -11,7 +11,7 @@ dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarc
 dnf install -y mkpasswd podman skopeo flightctl-agent cockpit cockpit-machines cockpit-podman \
                cockpit-files cockpit-ostree cockpit-pcp cockpit-system libvirt libvirt-daemon-kvm \
                virt-install virt-top libguestfs-tools genisoimage greenboot greenboot-default-health-checks \
-               stress-ng yq podman-compose tmux
+               stress-ng yq podman-compose tmux smartmontools hdparm tcpdump
 dnf clean all
 
 if [ -n "$ADMIN_USERNAME" ]; then

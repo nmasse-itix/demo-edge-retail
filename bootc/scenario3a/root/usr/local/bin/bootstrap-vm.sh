@@ -8,7 +8,7 @@ if [[ $# -ne 1 ]]; then
 fi
 
 VM="${1}"
-if [ -f "/var/lib/libvirt/images/${VM}/root.qcow2" ]; then
+if [ -d "/var/lib/libvirt/images/${VM}/" ]; then
   echo "VM ${VM} already exists. Please remove it first."
   exit 1
 fi
@@ -21,7 +21,7 @@ cleanup() {
     echo "An error occurred. Cleaning up..."
     virsh destroy "${VM}" || true
     virsh undefine "${VM}" --nvram || true
-    rm -f "/var/lib/libvirt/images/${VM}/root.qcow2"
+    rm -rf "/var/lib/libvirt/images/${VM}/"
   fi
 }
 trap cleanup EXIT
